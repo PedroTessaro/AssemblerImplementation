@@ -1,21 +1,27 @@
-public class Node <T>{
-	private T dado;
-	private Node<T> prox; 
+public class Node {
+	private int line;
+    private String code;
+	private Node next; 
 	
 	public Node() {
-		this(null, null);
+		this(null, null, null);
 	}
 	
-	public Node(T dado, Node<T> prox) {
-		this.dado = dado;
-		this.prox = prox;
+	public Node(int line, String code, Node next) {
+        this.line = line;
+        this.code = code;
+        this.next = next;
 	}
     
-	public Node<T> getProx() { return prox; };
+	public Node getNext()   { return next; };
 	
-	public T getDado(){ return dado; };
-	
-	public void setProx(Node<T> prox) { this.prox = prox; };
+	public int getLine()    { return line; };
 
-	public void setDado(T dado) { this.dado = dado;	};	
+    public String getCode() { return code; };
+	
+	public void setNext(Node next)   { this.next = next; };
+
+	public void setLine(int line)    { this.line = line; };	
+
+    public void setCode(String code) { this.code = code; };
 }
