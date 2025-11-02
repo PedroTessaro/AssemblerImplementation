@@ -20,7 +20,7 @@ public class LinkedList<T> {
 		return size;
 	}
 
-	public Node<T> getHead() {
+	public Node getHead() {
 		return head;
 	}
 
@@ -111,7 +111,7 @@ public class LinkedList<T> {
 	    }else{
 	      pAnda = head;
 
-	      while ((pAnda != null) && (pAnda.getLine().equals(line) != true))
+	      while ((pAnda != null) && (pAnda.getLine() != line))
 	        pAnda = pAnda.getNext();
 	      return pAnda; 
 	    }
@@ -124,7 +124,7 @@ public class LinkedList<T> {
 	    else{  
 	      pAnda = head;
 
-	      while ((pAnda != null) && (pAnda.getLine().equals(line) != true)){
+	      while ((pAnda != null) && (pAnda.getLine() != line)){
 	        pAnt = pAnda;
 	        pAnda = pAnda.getNext();
 	      }
@@ -143,7 +143,7 @@ public class LinkedList<T> {
 	}
 
 	public int pollFirst(){
-	    if (isEmpty()) return null; 
+	    if (isEmpty()) return -1; 
 	    else{  
 		  Node pAux = head;
 	      head = head.getNext();
@@ -153,7 +153,7 @@ public class LinkedList<T> {
 	}	
 
 	public int pollLast(){
-	    if (isEmpty()) return null; 
+	    if (isEmpty()) return -1; 
 	    else{  
 		  Node pAnda = head, pAnt = null;
 
@@ -198,7 +198,7 @@ public class LinkedList<T> {
 		sb.append("\n[Lista]\n");
 	
 	    sb.append("L: [ ");
-	    Node<T> pAnda = head;
+	    Node pAnda = head;
 	    while (pAnda != null) {
 	      sb.append(pAnda.getLine()+" "+pAnda.getCode()+" ");
 	      qtde++;

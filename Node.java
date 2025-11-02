@@ -4,7 +4,7 @@ public class Node {
 	private Node next; 
 	
 	public Node() {
-		this(null, null, null);
+		this(-1, null, null);
 	}
 	
 	public Node(int line, String code, Node next) {
