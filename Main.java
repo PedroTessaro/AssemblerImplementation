@@ -43,21 +43,29 @@ public class Main {
                     Matcher matcher = pattern.matcher(expression);
 
                     if(matcher.matches()) {
-                        System.out.println("LOAD instruction");
                         // LOAD instruction code
+                        // LOAD <FILE_NAME.ED1>
                         if(file.exists()) {
                             System.out.println("Deseja substituir o arquivo?(S/N)");
                             String confirmation = "";
-                            while(!confirmation.equals("S") || !confirmation.equals("N")) {
-                                confirmation = scanner.nextLine();
+                            while(!confirmation.equals("S") && !confirmation.equals("N")) {
                                 System.out.println("Digite uma resposta válida: S/N");
+                                confirmation = scanner.nextLine();
                             }
                             if(confirmation.equals("N")) break;
                         } 
                          
-                        String fileName = expression.substring(5, expression.length() - 1);  
+                        String fileName = expression.substring(5, expression.length());  
+                        System.out.println(fileName);
                         file = new File(fileName);
-                        if(!file.exists()) System.out.println("O arquivo espeficificado não existe!");
+
+                        if(!file.exists()) { 
+                            System.out.println("O arquivo espeficificado não existe!");
+                            break;
+                        }
+
+                        System.out.println("O arquivo foi carregado com sucesso!");
+                        // END OF LOAD INSTRUCTION
                     } 
                     else {
                         pattern = Pattern.compile("^INS [0-9]+ [A-Za-z]+ [A-Za-z] [0-9A-Za-z]*$");
