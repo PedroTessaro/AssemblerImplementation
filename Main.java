@@ -5,13 +5,53 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 public class Main {
+
+    private static void assembler() {
+        try(Scanner fileReader = new Scanner(file)) {
+            int counter = 0;
+
+            while(fileReader.hasNextLine()) {
+                counter++;
+                String data = fileReader.nextLine();
+
+                Pattern _pattern = Pattern.compile("^([0-9]+) ([A-Za-z]+) ([A-Za-z]+) ?([A-Za-z0-9]*)");
+                Matcher _matcher = _pattern.matcher(data);
+
+                int lineNumber = -1;
+                String instruction = "";
+                String firstRegister = "";
+                String secondRegister = "";
+
+                if(_matcher.find()) {
+                    lineNumber = Integer.parseInt(_matcher.group(1));
+                    instruction = _matcher.group(2);
+                    firstRegister = _matcher.group(3);
+                    secondRegister = _matcher.group(4);
+
+                    System.out.println(lineNumber);
+                    System.out.println(instruction);
+                    System.out.println(firstRegister);
+                    System.out.println(secondRegister);
+                }
+                else {
+                    System.out.println("Erro de sintaxe na linha " + counter + " do arquivo");
+                    break;
+                }
+            } 
+        }
+        catch(FileNotFoundException e) {
+            System.out.println("Carregue um arquivo primeiro!");
+        }
+    }
+
+    static Scanner scanner = new Scanner(System.in); 
+    static File file = new File("");
+    
+    static String expression = "";
+
+    static LinkedList list = new LinkedList();
+
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in); 
-        File file = new File("");
-        // test account
-        
-        String expression = "";
-        
         while(true) {
             System.out.print("> ");
             expression = scanner.nextLine();
@@ -32,7 +72,7 @@ public class Main {
                     break;
 
                 case "RUN":
-                    System.out.println("RUN");
+                    assembler();
                     break;
 
                 case "SAVE":
@@ -74,6 +114,8 @@ public class Main {
 
                         if(matcher.matches()) {
                             // INS instruction code
+                            // INS <LINE> <INSTRUCTION>
+                            
                         } 
                         else {
                             pattern = Pattern.compile("^DEL [0-9]+ *$");
