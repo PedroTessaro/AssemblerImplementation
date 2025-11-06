@@ -1,2 +1,6 @@
 30 mov a b
-30 add a
+27 inc x
+40 mov y x
+31 add a
+1 mov a c
+1 inc a

@@ -5,33 +5,37 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 public class Main {
-
     private static void assembler() {
+        int counter = 0;
         try(Scanner fileReader = new Scanner(file)) {
-            int counter = 0;
-
             while(fileReader.hasNextLine()) {
-                counter++;
                 String data = fileReader.nextLine();
+                counter++;
+            }
 
-                Pattern _pattern = Pattern.compile("^([0-9]+) ([A-Za-z]+) ([A-Za-z]+) ?([A-Za-z0-9]*)");
-                Matcher _matcher = _pattern.matcher(data);
+        }
+        catch(FileNotFoundException e) {
+            System.out.println("Carregue um arquivo primeiro!");
+        }
 
+        try(Scanner fileReader = new Scanner(file)) {
+            char[] registers = new char[26];
+            int[]  values    = new int[26];
+            while(fileReader.hasNextLine()) {
+                String data = fileReader.nextLine();
+                String code = "";
+
+                int greater = 0;
                 int lineNumber = -1;
-                String instruction = "";
-                String firstRegister = "";
-                String secondRegister = "";
+
+                Pattern _pattern = Pattern.compile("^([0-9]+) ([A-Za-z]+ [A-Za-z]+ ?[A-Za-z0-9]*)");
+                Matcher _matcher = _pattern.matcher(data);
 
                 if(_matcher.find()) {
                     lineNumber = Integer.parseInt(_matcher.group(1));
-                    instruction = _matcher.group(2);
-                    firstRegister = _matcher.group(3);
-                    secondRegister = _matcher.group(4);
-
-                    System.out.println(lineNumber);
-                    System.out.println(instruction);
-                    System.out.println(firstRegister);
-                    System.out.println(secondRegister);
+                    code = _matcher.group(2);
+                    
+                    list.insertOrdered(lineNumber, code);
                 }
                 else {
                     System.out.println("Erro de sintaxe na linha " + counter + " do arquivo");
@@ -73,6 +77,7 @@ public class Main {
 
                 case "RUN":
                     assembler();
+                    list.print();
                     break;
 
                 case "SAVE":

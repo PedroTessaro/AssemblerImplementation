@@ -36,6 +36,39 @@ public class LinkedList {
 		return pAnda;
 	}
 
+public boolean insertOrdered(int line, String code) {
+    if (line <= 0) return false;
+    if (isFull()) return false;
+
+    Node node = new Node(line, code, null);
+
+    if (isEmpty()) {
+        head = node;
+        return true;
+    }
+
+    Node pAnt = null;
+    Node pAnda = head;
+
+    while (pAnda != null && pAnda.getLine() < line) {
+        pAnt = pAnda;
+        pAnda = pAnda.getNext();
+    }
+
+    if (pAnda != null && pAnda.getLine() == line) {
+        pAnda.setCode(code);
+        return true;
+    }
+
+    node.setNext(pAnda);
+    if (pAnt == null)
+        head = node; 
+    else
+        pAnt.setNext(node);
+
+    return true;
+}
+
 	public boolean insert(int line, String code) {
 		Node aux; 
 		Node pAnda; 	
@@ -171,7 +204,7 @@ public class LinkedList {
 		Node pAnda; 
 	    pAnda = head;
 	    while (pAnda != null) {
-	      System.out.println("Linha:" + pAnda.getLine() + "Código:" + pAnda.getCode());
+	      System.out.println("Linha:" + pAnda.getLine() + " Código:" + pAnda.getCode());
 	      pAnda = pAnda.getNext();
 	    }
 	}
