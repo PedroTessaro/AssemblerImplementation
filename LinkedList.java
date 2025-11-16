@@ -171,7 +171,7 @@ public class LinkedList {
 		Node pAnda; 
 	    pAnda = head;
 	    while (pAnda != null) {
-	      System.out.println("Linha:" + pAnda.getLine() + " Código:" + pAnda.getCode());
+	      System.out.println("Linha: " + pAnda.getLine() + " | Código: " + pAnda.getCode());
 	      pAnda = pAnda.getNext();
 	    }
 	}

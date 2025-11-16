@@ -3,14 +3,18 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public class Main {
-    private static void assembler() {
-        char[] registers    = "abcdefghijklmnopqrstuvwxyz".toCharArray();;
-        int[] values        = new int[26];
+    static Scanner scanner = new Scanner(System.in); 
+    static File file = new File("");
+    
+    static String expression = "";
 
-        short registerCounter = 0; 
-        short errorCode = 0;
+    static LinkedList list = new LinkedList();
+
+    private static void loadToMemory() {
         short counter = 0;
 
         try(Scanner fileReader = new Scanner(file)) {
@@ -39,6 +43,14 @@ public class Main {
             System.out.println("Carregue um arquivo primeiro!");
             return;
         }
+    }
+
+    private static void assembler() {
+        char[] registers    = "ABCDEFGHIJKLMNOPQRSWXYZ".toCharArray();;
+        int[] values        = new int[26];
+
+        short registerCounter = 0; 
+        short errorCode = 0;
 
         Node pointer = list.getHead();
 
@@ -52,13 +64,12 @@ public class Main {
             lineNumber = pointer.getLine();
             code = pointer.getCode();
 
-            char firstRegister = code.charAt(4);
+            char firstRegister = code.toUpperCase().charAt(4);
 
             String instruction = code.substring(0, 3).toUpperCase();
-        
 
             if(!instruction.equals("OUT") && !instruction.equals("INC") && !instruction.equals("DEC") && code.length() < 6) {
-                System.out.println("Falta de segundo registrador na linha " + lineNumber + " do código");
+                System.out.println("ERRO: Falta de segundo registrador na linha " + lineNumber + " do código");
                 break;
             }
 
@@ -66,7 +77,7 @@ public class Main {
                 case "MOV":
                     for(int i = 0; i < registers.length; i++) {
                         if(firstRegister == registers[i]) {
-                            String value = code.substring(6);
+                            String value = code.toUpperCase().substring(6);
                             // It is a numerical value
                             if(value.matches("^-?[0-9]*$")) {
                                 values[i] = Integer.parseInt(value); 
@@ -116,19 +127,22 @@ public class Main {
                 case "ADD":
                     for(int i = 0; i < registers.length; i++) {
                         if(firstRegister == registers[i]) {
-                            String value = code.substring(6);
+                            String value = code.toUpperCase().substring(6);
                             if(value.matches("^-?[0-9]*$")) {
                                 values[i] += Integer.parseInt(value);
                             }
-                            else {
+                            else if(value.matches("^[a-zA-z]*$")){
                                 for(int j = 0; j < registers.length; j++) {
                                     if(value.charAt(0) == registers[j]) {
                                         values[i] += values[j];
-                                        break;
                                     }
                                 }
-                                break;
                             }
+                            else {
+                                System.out.println("ERRO: segundo registrador ou valor incorreto na linha " + lineNumber);
+                                errorCode = 1;  
+                            }
+                            break;
                         }
                     }
                     break;
@@ -136,19 +150,23 @@ public class Main {
                 case "SUB":
                     for(int i = 0; i < registers.length; i++) {
                         if(firstRegister == registers[i]) {
-                            String value = code.substring(6);
+                            String value = code.toUpperCase().substring(6);
                             if(value.matches("^-?[0-9]*$")) {
                                 values[i] -= Integer.parseInt(value);
                             }
-                            else {
+                            else if(value.matches("^[a-zA-Z]+$")){
                                 for(int j = 0; j < registers.length; j++) {
                                     if(value.charAt(0) == registers[j]) {
                                         values[i] -= values[j];
                                         break;
                                     }
                                 }
-                                break;
+                            } 
+                            else {
+                                System.out.println("ERRO: segundo registrador ou valor incorreto na linha " + lineNumber);
+                                errorCode = 1;  
                             }
+                            break;
                         }
                     }
                     break;
@@ -156,11 +174,11 @@ public class Main {
                 case "MUL":
                     for(int i = 0; i < registers.length; i++) {
                         if(firstRegister == registers[i]) {
-                            String value = code.substring(6);
+                            String value = code.toUpperCase().substring(6);
                             if(value.matches("^-?[0-9]*$")) {
                                 values[i] *= Integer.parseInt(value);
                             }
-                            else {
+                            else if(value.matches("^[a-zA-Z]+$")) {
                                 for(int j = 0; j < registers.length; j++) {
                                     if(value.charAt(0) == registers[j]) {
                                         values[i] *= values[j];
@@ -169,6 +187,11 @@ public class Main {
                                 }
                                 break;
                             }
+                            else {
+                                System.out.println("ERRO: segundo registrador ou valor incorreto na linha " + lineNumber);
+                                errorCode = 1;  
+                            }
+                            break;
                         }
                     }
                     break;
@@ -176,7 +199,7 @@ public class Main {
                 case "DIV":
                     for(int i = 0; i < registers.length; i++) {
                         if(firstRegister == registers[i]) {
-                            String value = code.substring(6);
+                            String value = code.toUpperCase().substring(6);
                             if(value.matches("^-?[0-9]*$")) {
                                 int intValue = Integer.parseInt(value);
                                 if(intValue == 0) {
@@ -187,15 +210,18 @@ public class Main {
                                     values[i] /= Integer.parseInt(value);
                                 }
                             }
-                            else {
+                            else if(value.matches("^[a-zA-z]*$")){
                                 for(int j = 0; j < registers.length; j++) {
                                     if(value.charAt(0) == registers[j]) {
                                         values[i] /= values[j];
-                                        break;
                                     }
                                 }
-                                break;
                             }
+                            else {
+                                System.out.println("ERRO: segundo registrador ou valor incorreto na linha " + lineNumber);
+                                errorCode = 1;  
+                            }
+                            break;
                         }
                     }
                     break;
@@ -203,7 +229,7 @@ public class Main {
                 case "JNZ":
                     for(int i = 0; i < registers.length; i++) {
                         if(firstRegister == registers[i] && values[i] != 0) {
-                            String value = code.substring(6);
+                            String value = code.toUpperCase().substring(6);
                             if(value.matches("^[0-9]*$")) {
                                 Node gotoNode = list.search(Integer.parseInt(value));
                                 if(gotoNode == null) {
@@ -233,12 +259,22 @@ public class Main {
         }
     }
 
-    static Scanner scanner = new Scanner(System.in); 
-    static File file = new File("");
-    
-    static String expression = "";
+    private static void saveFile(String fileName) {
+        try {
+            PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+            Node pointer = list.getHead();
 
-    static LinkedList list = new LinkedList();
+            while(pointer != null) {
+                writer.println("" + pointer.getLine() + " " + pointer.getCode());
+                System.out.println("" + pointer.getLine() + " " + pointer.getCode());
+                pointer = pointer.getNext();
+            } 
+            writer.close();
+        }
+        catch(Exception e) { 
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
         while(true) {
@@ -257,15 +293,25 @@ public class Main {
                     break;
 
                 case "LIST":
-                    System.out.println("LIST");
+                    if(!list.isEmpty()) {
+                        list.print();
+                    }
+                    else {
+                        System.out.println("Carregue um arquivo na memória primeiro!");
+                    }
                     break;
 
                 case "RUN":
-                    assembler();
+                    if(!list.isEmpty()) {
+                        assembler();
+                    }
+                    else {
+                        System.out.println("Carreguei um arquivo na memória primeiro!");
+                    }
                     break;
 
                 case "SAVE":
-                    System.out.println("SAVE");
+                    saveFile(file.getName());
                     break;
 
                 default:
@@ -286,7 +332,6 @@ public class Main {
                         } 
                          
                         String fileName = expression.substring(5, expression.length());  
-                        System.out.println(fileName);
                         file = new File(fileName);
 
                         if(!file.exists()) { 
@@ -294,17 +339,33 @@ public class Main {
                             break;
                         }
 
+                        loadToMemory();
                         System.out.println("O arquivo foi carregado com sucesso!");
                         // END OF LOAD INSTRUCTION
                     } 
                     else {
-                        pattern = Pattern.compile("^INS [0-9]+ [A-Za-z]+ [A-Za-z] [0-9A-Za-z]*$");
+                        pattern = Pattern.compile("^INS ([0-9]+ [A-Za-z]+ [A-Za-z] ?[0-9A-Za-z]*)$");
                         matcher = pattern.matcher(expression);
 
                         if(matcher.matches()) {
                             // INS instruction code
                             // INS <LINE> <INSTRUCTION>
-                            
+                            String data = matcher.group(1);
+
+                            pattern = Pattern.compile("^([0-9]+) ([A-Za-z]+ [A-Za-z]+ ?[A-Za-z0-9]*)");
+                            matcher = pattern.matcher(data);
+
+                            if(matcher.matches()) {
+                                int line = Integer.parseInt(matcher.group(1));
+                                String code = matcher.group(2);
+
+                                list.insertOrdered(line, code);
+                                System.out.println("Linha inserida com sucesso!");
+                            } 
+                            else {
+                                System.out.println("ERRO: sintaxe no trecho: '" + data + "' incorreta!");
+                            }
+                            // END of INS instruction
                         } 
                         else {
                             pattern = Pattern.compile("^DEL [0-9]+ *$");
@@ -312,19 +373,63 @@ public class Main {
 
                             if(matcher.matches()) {
                                 // DEL instruction code
+                                String line = expression.substring(4, expression.length());  
+                                if(list.remove(Integer.parseInt(line))) {
+                                    System.out.println("Linha removida com sucesso!");
+                                }
+                                else {
+                                    System.out.println("Não foi possível remover a linha " + line);
+                                }
+                                // END of DEL instruction
                             } 
                             else {
-                                pattern = Pattern.compile("^DEL [0-9]+ [0-9+]$");
+                                pattern = Pattern.compile("^DEL ([0-9]+) ([0-9]+)$");
                                 matcher = pattern.matcher(expression);
                                 
                                 if(matcher.matches()) {
                                     // DEL(range) instruction code
+                                    int startLine = Integer.parseInt(matcher.group(1));
+                                    int endLine   = Integer.parseInt(matcher.group(2));
+                                    for(int i = startLine; i <= endLine; i++) {
+                                        list.remove(i);
+                                    } 
+                                    System.out.println("Todas as linhas no intervalo " + startLine + ":" + endLine + " foram deletadas!");
+                                    // END of DEL(range) instruction
                                 } 
                                 else {
-                                    pattern = Pattern.compile("^SAVE [A-Za-z0-9]+.ed1$");
+                                    pattern = Pattern.compile("^SAVE ([A-Za-z0-9]+.ED1)$");
+                                    matcher = pattern.matcher(expression);
 
                                     if(matcher.matches()) {
                                         // SAVE(especific file) instruction code
+                                        String fileName = matcher.group(1).toLowerCase();
+
+                                        if(file.exists()) {
+                                            System.out.println("Deseja salvar as alterações feitas no arquivo atual?");
+                                            String confirmation = "";
+                                            while(!confirmation.toUpperCase().equals("S") && !confirmation.toUpperCase().equals("N")) {
+                                                System.out.println("Digite uma resposta válida: S/N");
+                                                confirmation = scanner.nextLine();
+                                            }
+                                            if(confirmation.equals("N")) break;
+
+                                            try {
+                                                file = new File(fileName);
+                                                if(!file.exists()) { 
+                                                    file.createNewFile();
+                                                    System.out.println("Novo arquivo criado com nome " + fileName);
+                                                }
+                                                else {
+                                                    System.out.println("Trocando para arquivo " + fileName);
+                                                }
+                                                saveFile(fileName);    
+                                            }
+                                            catch(Exception e) {
+                                                System.out.println("ERRO: não foi possível abrir ou criar o arquivo!");
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                        // END of SAVE(especific file) instruction
                                     }
                                 }
                             }

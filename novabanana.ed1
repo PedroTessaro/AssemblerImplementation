@@ -1,4 +1,5 @@
 5 mov a 3
+6 OUT B
 7 INC A
 10 MOV B 2
 25 add a B
