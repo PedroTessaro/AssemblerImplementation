@@ -1,6 +1,7 @@
-30 mov a b
-27 inc x
-40 mov y x
-31 add a
-1 mov a c
-1 inc a
+10 mov a 2
+15 mov b a
+20 out b
+25 dec b
+30 out b 
+35 inc b 
+40 out b
