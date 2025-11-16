@@ -1,5 +1,0 @@
-5 mov a 3
-7 INC A
-10 MOV B 2
-25 add a B
-40 out A
