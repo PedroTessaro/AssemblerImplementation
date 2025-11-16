@@ -1,4 +1,2 @@
-35 out a
-20 mov b 3
-10 mov a 2
-30 add a b
+10 mov a 10
+20 div a 0

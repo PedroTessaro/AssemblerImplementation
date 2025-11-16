@@ -47,12 +47,15 @@ public class Main {
 
             int greater = 0;
             int lineNumber = -1;
+            int pointerCode = 0;
 
             lineNumber = pointer.getLine();
             code = pointer.getCode();
 
-            String instruction = code.substring(0, 3).toUpperCase();
             char firstRegister = code.charAt(4);
+
+            String instruction = code.substring(0, 3).toUpperCase();
+        
 
             if(!instruction.equals("OUT") && !instruction.equals("INC") && !instruction.equals("DEC") && code.length() < 6) {
                 System.out.println("Falta de segundo registrador na linha " + lineNumber + " do código");
@@ -65,7 +68,7 @@ public class Main {
                         if(firstRegister == registers[i]) {
                             String value = code.substring(6);
                             // It is a numerical value
-                            if(value.matches("^[0-9]*$")) {
+                            if(value.matches("^-?[0-9]*$")) {
                                 values[i] = Integer.parseInt(value); 
                                 break;
                             } 
@@ -114,9 +117,103 @@ public class Main {
                     for(int i = 0; i < registers.length; i++) {
                         if(firstRegister == registers[i]) {
                             String value = code.substring(6);
-                            for(int j = 0; j < registers[j]; j++) {
-                                values[i] += values[j];
+                            if(value.matches("^-?[0-9]*$")) {
+                                values[i] += Integer.parseInt(value);
+                            }
+                            else {
+                                for(int j = 0; j < registers.length; j++) {
+                                    if(value.charAt(0) == registers[j]) {
+                                        values[i] += values[j];
+                                        break;
+                                    }
+                                }
                                 break;
+                            }
+                        }
+                    }
+                    break;
+
+                case "SUB":
+                    for(int i = 0; i < registers.length; i++) {
+                        if(firstRegister == registers[i]) {
+                            String value = code.substring(6);
+                            if(value.matches("^-?[0-9]*$")) {
+                                values[i] -= Integer.parseInt(value);
+                            }
+                            else {
+                                for(int j = 0; j < registers.length; j++) {
+                                    if(value.charAt(0) == registers[j]) {
+                                        values[i] -= values[j];
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    break;
+
+                case "MUL":
+                    for(int i = 0; i < registers.length; i++) {
+                        if(firstRegister == registers[i]) {
+                            String value = code.substring(6);
+                            if(value.matches("^-?[0-9]*$")) {
+                                values[i] *= Integer.parseInt(value);
+                            }
+                            else {
+                                for(int j = 0; j < registers.length; j++) {
+                                    if(value.charAt(0) == registers[j]) {
+                                        values[i] *= values[j];
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    break;
+
+                case "DIV":
+                    for(int i = 0; i < registers.length; i++) {
+                        if(firstRegister == registers[i]) {
+                            String value = code.substring(6);
+                            if(value.matches("^-?[0-9]*$")) {
+                                int intValue = Integer.parseInt(value);
+                                if(intValue == 0) {
+                                    System.out.println("ERRO: Divisão por zero!");
+                                    errorCode = 1;
+                                }
+                                else {
+                                    values[i] /= Integer.parseInt(value);
+                                }
+                            }
+                            else {
+                                for(int j = 0; j < registers.length; j++) {
+                                    if(value.charAt(0) == registers[j]) {
+                                        values[i] /= values[j];
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    break;
+
+                case "JNZ":
+                    for(int i = 0; i < registers.length; i++) {
+                        if(firstRegister == registers[i] && values[i] != 0) {
+                            String value = code.substring(6);
+                            if(value.matches("^[0-9]*$")) {
+                                Node gotoNode = list.search(Integer.parseInt(value));
+                                if(gotoNode == null) {
+                                    System.out.println("O valor: " + value + " não é uma linha válida!");
+                                    errorCode = 1;
+                                }
+                                else {
+                                    pointer = gotoNode;
+                                    pointerCode = 1;
+                                }
                             }
                             break;
                         }
@@ -130,7 +227,9 @@ public class Main {
             }
 
             if(errorCode != 0) break;
-            pointer = pointer.getNext();
+            if(pointerCode == 0) {
+                pointer = pointer.getNext();
+            }
         }
     }
 
