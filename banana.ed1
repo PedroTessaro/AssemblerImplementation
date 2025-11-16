@@ -1,7 +1,4 @@
+35 out a
+20 mov b 3
 10 mov a 2
-15 mov b a
-20 out b
-25 dec b
-30 out b 
-35 inc b 
-40 out b
+30 add a b

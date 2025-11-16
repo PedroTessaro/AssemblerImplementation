@@ -36,71 +36,38 @@ public class LinkedList {
 		return pAnda;
 	}
 
-public boolean insertOrdered(int line, String code) {
-    if (line <= 0) return false;
-    if (isFull()) return false;
+    public boolean insertOrdered(int line, String code) {
+        if (line <= 0) return false;
+        if (isFull()) return false;
 
-    Node node = new Node(line, code, null);
+        Node node = new Node(line, code, null);
 
-    if (isEmpty()) {
-        head = node;
+        if (isEmpty()) {
+            head = node;
+            return true;
+        }
+
+        Node pAnt = null;
+        Node pAnda = head;
+
+        while (pAnda != null && pAnda.getLine() < line) {
+            pAnt = pAnda;
+            pAnda = pAnda.getNext();
+        }
+
+        if (pAnda != null && pAnda.getLine() == line) {
+            pAnda.setCode(code);
+            return true;
+        }
+
+        node.setNext(pAnda);
+        if (pAnt == null)
+            head = node; 
+        else
+            pAnt.setNext(node);
+
         return true;
     }
-
-    Node pAnt = null;
-    Node pAnda = head;
-
-    while (pAnda != null && pAnda.getLine() < line) {
-        pAnt = pAnda;
-        pAnda = pAnda.getNext();
-    }
-
-    if (pAnda != null && pAnda.getLine() == line) {
-        pAnda.setCode(code);
-        return true;
-    }
-
-    node.setNext(pAnda);
-    if (pAnt == null)
-        head = node; 
-    else
-        pAnt.setNext(node);
-
-    return true;
-}
-
-	public boolean insert(int line, String code) {
-		Node aux; 
-		Node pAnda; 	
-		Node pAnt = null;  
-
-		if (line <= 0) return false; 
-	    if (!isFull()){ 
-	      aux = new Node(line, code, null);
-	      if (isEmpty()){ 
-	    	head = aux;
-	      } else if (line >= size+1) {
-	    	insertTail(line, code);
-	      } else {
-	    	int cont = 1;
-	        pAnda = head;   
-	        while (pAnda.getNext() != null && cont != line){
-	           pAnt = pAnda;
-	           pAnda = pAnda.getNext();
-	           cont++;
-	        }
-        	aux.setNext(pAnda);
-	        if (cont == 1) { 
-	        	head = aux;
-	        } else { 
-	        	pAnt.setNext(aux);
-	        }
-	      }
-		  size++;
-		  return true; 
-	    }
-	    else return false; 
-	};
 
 	public boolean insertHead(int line, String code){
 		Node aux; 

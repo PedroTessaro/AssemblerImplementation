@@ -6,111 +6,131 @@ import java.io.FileNotFoundException;
 
 public class Main {
     private static void assembler() {
-        int counter = 0;
+        char[] registers    = "abcdefghijklmnopqrstuvwxyz".toCharArray();;
+        int[] values        = new int[26];
+
+        short registerCounter = 0; 
+        short errorCode = 0;
+        short counter = 0;
+
         try(Scanner fileReader = new Scanner(file)) {
             while(fileReader.hasNextLine()) {
-                String data = fileReader.nextLine();
                 counter++;
-            }
-        }
-        catch(FileNotFoundException e) {
-            System.out.println("Carregue um arquivo primeiro!");
-        }
-
-        try(Scanner fileReader = new Scanner(file)) {
-            char[] registers    = "abcdefghijklmnopqrstuvwxyz".toCharArray();;
-            int[] values        = new int[26];
-            int registerCounter = 0; 
-
-            while(fileReader.hasNextLine()) {
                 String data = fileReader.nextLine();
                 String code = "";
 
-                int greater = 0;
                 int lineNumber = -1;
 
                 Pattern _pattern = Pattern.compile("^([0-9]+) ([A-Za-z]+ [A-Za-z]+ ?[A-Za-z0-9]*)");
                 Matcher _matcher = _pattern.matcher(data);
 
-                short errorCode = 0;
-
                 if(_matcher.find()) {
                     lineNumber = Integer.parseInt(_matcher.group(1));
                     code = _matcher.group(2);
-
-                    String instruction = code.substring(0, 3).toUpperCase();
-                    char firstRegister = code.charAt(4);
-
-                    if((instruction == "INC" || instruction == "DEC" || instruction == "OUT") && code.length() < 6) {
-                        System.out.println("Falta de segundo registrador na linha " + lineNumber + " do arquivo");
-                        return;
-                    }
-
-                    switch (instruction) {
-                        case "MOV":
-                            String value = code.substring(6);
-
-                            for(int i = 0; i < registers.length; i++) {
-                                if(firstRegister == registers[i]) {
-                                    // It is a numerical value
-                                    if(value.matches("^[0-9]*$")) {
-                                        values[i] = Integer.parseInt(value); 
-                                        break;
-                                    } 
-                                    // It is not a numerical value
-                                    else {
-                                        for(int j = 0; j < registers.length; j++) {
-                                            if(value.charAt(0) == registers[j]) {
-                                                values[i] = values[j]; 
-                                                break;
-                                            }
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-
-                        case "OUT":
-                            for(int i = 0; i < registers.length; i++) {
-                                if(firstRegister == registers[i]) {
-                                    System.out.println("O registrador " + firstRegister + " tem o valor: " + values[i]);
-                                    break;
-                                }
-                            }
-                            break;
-
-                        case "INC":
-                            for(int i = 0; i < registers.length; i++) {
-                                if(firstRegister == registers[i]) {
-                                    values[i] += 1;
-                                }
-                            }
-                            break;
-                            
-                        case "DEC":
-                            for(int i = 0; i < registers.length; i++) {
-                                if(firstRegister == registers[i]) {
-                                    values[i] -= 1;
-                                }
-                            }
-                            break;
-
-                        default:
-                            System.out.println("Erro de sintaxe na linha " + lineNumber + " do arquivo");
-                            break;
-                    }
-                    
                     list.insertOrdered(lineNumber, code);
-                }
+                } 
                 else {
                     System.out.println("Erro de sintaxe na linha " + counter + " do arquivo");
-                    break;
+                    return;
                 }
-            } 
+            }
         }
         catch(FileNotFoundException e) {
             System.out.println("Carregue um arquivo primeiro!");
+            return;
+        }
+
+        Node pointer = list.getHead();
+
+        while(pointer != null) {
+            String code = "";
+
+            int greater = 0;
+            int lineNumber = -1;
+
+            lineNumber = pointer.getLine();
+            code = pointer.getCode();
+
+            String instruction = code.substring(0, 3).toUpperCase();
+            char firstRegister = code.charAt(4);
+
+            if(!instruction.equals("OUT") && !instruction.equals("INC") && !instruction.equals("DEC") && code.length() < 6) {
+                System.out.println("Falta de segundo registrador na linha " + lineNumber + " do código");
+                break;
+            }
+
+            switch (instruction) {
+                case "MOV":
+                    for(int i = 0; i < registers.length; i++) {
+                        if(firstRegister == registers[i]) {
+                            String value = code.substring(6);
+                            // It is a numerical value
+                            if(value.matches("^[0-9]*$")) {
+                                values[i] = Integer.parseInt(value); 
+                                break;
+                            } 
+                            // It is not a numerical value
+                            else {
+                                for(int j = 0; j < registers.length; j++) {
+                                    if(value.charAt(0) == registers[j]) {
+                                        values[i] = values[j]; 
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    break;
+
+                case "OUT":
+                    for(int i = 0; i < registers.length; i++) {
+                        if(firstRegister == registers[i]) {
+                            System.out.println("O registrador " + firstRegister + " tem o valor: " + values[i]);
+                            break;
+                        }
+                    }
+                    break;
+
+                case "INC":
+                    for(int i = 0; i < registers.length; i++) {
+                        if(firstRegister == registers[i]) {
+                            values[i] += 1;
+                            break;
+                        }
+                    }
+                    break;
+
+                case "DEC":
+                    for(int i = 0; i < registers.length; i++) {
+                        if(firstRegister == registers[i]) {
+                            values[i] -= 1;
+                            break;
+                        }
+                    }
+                    break;
+
+                case "ADD":
+                    for(int i = 0; i < registers.length; i++) {
+                        if(firstRegister == registers[i]) {
+                            String value = code.substring(6);
+                            for(int j = 0; j < registers[j]; j++) {
+                                values[i] += values[j];
+                                break;
+                            }
+                            break;
+                        }
+                    }
+                    break;
+
+                default:
+                    System.out.println("Erro de sintaxe na linha " + lineNumber + " do código");
+                    errorCode = 1;
+                    break;
+            }
+
+            if(errorCode != 0) break;
+            pointer = pointer.getNext();
         }
     }
 
@@ -143,7 +163,6 @@ public class Main {
 
                 case "RUN":
                     assembler();
-                    list.print();
                     break;
 
                 case "SAVE":
